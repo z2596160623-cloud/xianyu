@@ -169,8 +169,25 @@ def update_watch(s: Session, watch_id: int, **fields) -> WatchRow | None:
     row = s.get(WatchRow, watch_id)
     if row is None:
         return None
+    old_name = row.name
+    # 这些字段决定“什么商品算命中”。只有实质搜索条件改变时，
+    # 才让旧的待看结果退出；单纯改任务名不应清空结果。
+    matching_fields = {
+        "keywords", "price_min", "price_max", "city", "condition",
+        "free_shipping", "seller_min_credit", "requirement",
+    }
+    matching_changed = any(
+        key in fields and getattr(row, key) != fields[key]
+        for key in matching_fields
+    )
     for k, v in fields.items():
         setattr(row, k, v)
+    if matching_changed:
+        reset_pending_recommendations(s, old_name)
+    elif row.name != old_name:
+        # 只改名：保留现有发现，但分组名跟着新任务名更新。
+        for item in s.scalars(select(ItemRow).where(ItemRow.watch_name == old_name)):
+            item.watch_name = row.name
     s.commit()
     return row
 
@@ -178,8 +195,29 @@ def update_watch(s: Session, watch_id: int, **fields) -> WatchRow | None:
 def delete_watch(s: Session, watch_id: int) -> None:
     row = s.get(WatchRow, watch_id)
     if row is not None:
+        reset_pending_recommendations(s, row.name)
         s.delete(row)
         s.commit()
+
+
+def reset_pending_recommendations(s: Session, watch_name: str) -> int:
+    """让某任务尚未处理的旧发现退出列表。
+
+    不删商品和价格历史，也不动已收藏/已处理记录。把 rec_status
+    置空后，新条件如果再次命中同一商品，它可以重新进入发现列表。
+    """
+    rows = list(s.scalars(select(ItemRow).where(
+        ItemRow.watch_name == watch_name,
+        ItemRow.rec_status == "new",
+        ItemRow.favorited.is_(False),
+    )))
+    for item in rows:
+        item.rec_status = None
+        item.rec_created_at = None
+        item.rec_reason = None
+        item.rec_ok = None
+        item.watch_name = None
+    return len(rows)
 
 
 # ---------- App config (单行) ----------
@@ -218,6 +256,8 @@ def create_recommendation(s: Session, item: Item, watch_name: str | None,
     row = s.get(ItemRow, item.item_id)
     if row is None:
         return False
+    # 商品可能曾被旧任务见过；重新命中时必须归属当前任务。
+    row.watch_name = watch_name
     row.rec_status = "new"
     row.rec_created_at = _now()
     row.rec_reason = reason

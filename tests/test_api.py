@@ -21,6 +21,22 @@ def test_watch_crud_api(client):
     assert client.get("/api/watches").json() == []
 
 
+def test_editing_watch_filters_removes_old_discovery_results(client):
+    from xianyu_crawler.web import runtime
+    from xianyu_crawler.storage import repo
+    from xianyu_crawler.models import Item
+
+    created = client.post("/api/watches", json={"name": "手机", "keywords": ["iPhone 15"]}).json()
+    s = runtime.session()
+    repo.create_recommendation(
+        s, Item(item_id="old-phone", title="iPhone 15", url="u", price=3000), "手机")
+    assert len(client.get("/api/recommendations").json()) == 1
+
+    client.put(f"/api/watches/{created['id']}",
+               json={"name": "手机", "keywords": ["iPhone 16 Pro"]})
+    assert client.get("/api/recommendations").json() == []
+
+
 def test_config_api(client):
     assert "notify_to" in client.get("/api/config").json()   # 默认空, 走本地配置
     r = client.put("/api/config", json={"schedule_minutes": 60, "paused": True})

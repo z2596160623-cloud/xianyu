@@ -127,6 +127,41 @@ def test_publish_time_persisted():
     assert _row(s, "pt").publish_time == pt
 
 
+def test_update_watch_search_change_resets_only_its_pending_results():
+    s = session()
+    watch = repo.add_watch(s, name="测试苹果", keywords='["iPhone 15"]')
+    repo.create_recommendation(s, Item(item_id="old", title="15", url="u", price=1), "测试苹果")
+    repo.create_recommendation(s, Item(item_id="other", title="Mac", url="u", price=1), "Mac任务")
+
+    repo.update_watch(s, watch.id, name="测试苹果", keywords='["iPhone 16 Pro"]')
+
+    assert {r.item_id for r in repo.list_recommendations(s, "new")} == {"other"}
+    assert _row(s, "old").rec_status is None
+    # 新条件再次命中同一件商品时，允许重新推荐。
+    assert repo.create_recommendation(
+        s, Item(item_id="old", title="16 Pro", url="u", price=2), "测试苹果") is True
+    assert _row(s, "old").watch_name == "测试苹果"
+
+
+def test_update_watch_name_only_keeps_results_and_renames_group():
+    s = session()
+    watch = repo.add_watch(s, name="旧名", keywords='["iPhone"]')
+    repo.create_recommendation(s, Item(item_id="a", title="t", url="u", price=1), "旧名")
+
+    repo.update_watch(s, watch.id, name="新名", keywords='["iPhone"]')
+
+    assert _row(s, "a").rec_status == "new"
+    assert _row(s, "a").watch_name == "新名"
+
+
+def test_delete_watch_removes_its_pending_results_from_discovery():
+    s = session()
+    watch = repo.add_watch(s, name="待删除", keywords='["x"]')
+    repo.create_recommendation(s, Item(item_id="a", title="t", url="u", price=1), "待删除")
+    repo.delete_watch(s, watch.id)
+    assert repo.list_recommendations(s, "new") == []
+
+
 def test_list_favorites_includes_collection_and_sorts_dead_last():
     s = session()
     # 收藏夹来源(未经我们 approve)也应出现在收藏视图
