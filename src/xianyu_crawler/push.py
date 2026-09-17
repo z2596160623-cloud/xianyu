@@ -29,6 +29,16 @@ def format_push(event: dict) -> tuple[str, str, str | None]:
     return "闲鱼发现新商品", f"{title}\n价格 ¥{event.get('price', '-')}", url
 
 
+def _post_json(target: str, payload: dict) -> None:
+    """推送服务默认直连，避免失效的 Clash/系统代理导致 Windows 10061。"""
+    try:
+        with httpx.Client(trust_env=False, timeout=10.0) as client:
+            response = client.post(target, json=payload)
+        response.raise_for_status()
+    except httpx.ConnectError as exc:
+        raise ConnectionError("无法连接推送服务器，请检查电脑网络、防火墙或代理设置") from exc
+
+
 def send_bark(endpoint: str, title: str, body: str, url: str | None = None) -> None:
     target = _safe_https(endpoint)
     if not target:
@@ -36,19 +46,17 @@ def send_bark(endpoint: str, title: str, body: str, url: str | None = None) -> N
     payload = {"title": title, "body": body, "group": "十三闲鱼监控"}
     if url:
         payload["url"] = url
-    response = httpx.post(target, json=payload, timeout=10.0)
-    response.raise_for_status()
+    _post_json(target, payload)
 
 
 def send_dingtalk(webhook: str, title: str, body: str, url: str | None = None) -> None:
     target = _safe_https(webhook)
     if not target:
         return
-    response = httpx.post(target, json={
+    _post_json(target, {
         "msgtype": "link",
         "link": {"title": title, "text": body, "messageUrl": url or "https://www.goofish.com/"},
-    }, timeout=10.0)
-    response.raise_for_status()
+    })
 
 
 def send_event(settings, event: dict) -> int:
