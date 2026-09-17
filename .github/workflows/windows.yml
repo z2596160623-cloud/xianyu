@@ -16,6 +16,7 @@ jobs:
     timeout-minutes: 45
     env:
       XIANYU_LICENSE_SERVER: ${{ inputs.license_server || vars.LICENSE_SERVER || 'https://shisan-license.z2596160623.workers.dev' }}
+      PYTHONUTF8: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
