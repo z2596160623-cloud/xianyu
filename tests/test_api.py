@@ -27,6 +27,13 @@ def test_config_api(client):
     assert r.json()["schedule_minutes"] == 60 and r.json()["paused"] is True
 
 
+def test_pushplus_token_is_write_only(client):
+    r = client.put("/api/config", json={"pushplus_token": "secret-token"})
+    body = r.json()
+    assert body["pushplus_token_set"] is True
+    assert "secret-token" not in r.text
+
+
 def test_recommendations_api(client):
     from xianyu_crawler.web import runtime
     from xianyu_crawler.storage import repo
@@ -77,6 +84,7 @@ def test_rereview_endpoint(client, monkeypatch):
     from xianyu_crawler.web import runtime
     from xianyu_crawler.storage import repo
     from xianyu_crawler.models import Item
+    client.put("/api/config", json={"review_enabled": True})
     s = runtime.session()
     repo.add_watch(s, name="w", keywords='["x"]', requirement="必须 M1 Pro")
     repo.create_recommendation(s, Item(item_id="a", title="M1 Pro 机", url="u", price=7000),

@@ -86,6 +86,7 @@ def effective_settings(cfg: AppConfig) -> Settings:
         "smtp_user": pick(cfg.smtp_user, base.smtp_user),
         "smtp_pass": pick(cfg.smtp_pass, base.smtp_pass),
         "bark_url": pick(cfg.bark_url, base.bark_url),
+        "pushplus_token": pick(cfg.pushplus_token, base.pushplus_token),
         "dingtalk_webhook": pick(cfg.dingtalk_webhook, base.dingtalk_webhook),
         # 邮件提醒事件开关
         "notify_on_new": cfg.notify_on_new,

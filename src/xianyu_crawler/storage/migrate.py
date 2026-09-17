@@ -24,7 +24,7 @@ COLUMNS: list[tuple[str, str, str]] = [
     ("watches", "requirement", "TEXT"),
     ("app_config", "review_model", "TEXT NOT NULL DEFAULT 'doubao-seed-2.0-pro'"),
     ("app_config", "favorites_minutes", "INTEGER NOT NULL DEFAULT 30"),
-    ("app_config", "review_enabled", "BOOLEAN NOT NULL DEFAULT 1"),
+    ("app_config", "review_enabled", "BOOLEAN NOT NULL DEFAULT 0"),
     ("app_config", "review_base_url", "TEXT"),   # 空=回退本地 secret.env, 不写仓库
     ("app_config", "review_api_token", "TEXT"),
     ("app_config", "review_timeout", "REAL NOT NULL DEFAULT 30"),
@@ -41,6 +41,7 @@ COLUMNS: list[tuple[str, str, str]] = [
     ("app_config", "smtp_user", "TEXT"),
     ("app_config", "smtp_pass", "TEXT"),
     ("app_config", "bark_url", "TEXT"),
+    ("app_config", "pushplus_token", "TEXT"),
     ("app_config", "dingtalk_webhook", "TEXT"),
     ("app_config", "notify_on_drop", "BOOLEAN NOT NULL DEFAULT 1"),
     ("app_config", "notify_on_favorite", "BOOLEAN NOT NULL DEFAULT 1"),

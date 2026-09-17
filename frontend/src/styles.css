@@ -180,6 +180,33 @@ button { font-family: inherit; }
 .metric .v { font-weight: 600; font-size: 27px; letter-spacing: -.5px; line-height: 1; }
 .metric .v small { font-size: 13px; color: var(--acc); margin-left: 6px; font-weight: 500; }
 
+.guide-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }
+.guide-steps span { padding: 11px; background: var(--s2); border: 1px solid var(--line); border-radius: var(--rad); font-size: 12.5px; }
+.guide-steps b { display: inline-flex; width: 21px; height: 21px; margin-right: 7px; align-items: center; justify-content: center; border-radius: 50%; background: var(--soft); color: var(--acc); }
+.push-platforms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.push-platform { padding: 15px; background: var(--s2); border: 1px solid var(--line); border-radius: var(--rad); }
+.push-platform.recommended { border-color: var(--line2); }
+.push-platform-title { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 14px; }
+.push-platform-title em { font-style: normal; font-size: 10px; padding: 2px 6px; color: var(--acc); background: var(--soft); border-radius: 9px; }
+.push-platform p { min-height: 38px; margin: 8px 0 12px; color: var(--dim); font-size: 12px; line-height: 1.55; }
+.setup-link { display: inline-block; margin-top: 9px; color: var(--acc); font-size: 12px; }
+.help-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 18px; }
+.help-step { padding: 16px; }
+.help-step p { margin: 7px 0 0; color: var(--dim); font-size: 13px; line-height: 1.6; }
+.faq { margin: 0; }
+.faq dt { margin-top: 14px; color: var(--fg); font-size: 13px; font-weight: 600; }
+.faq dt:first-child { margin-top: 0; }
+.faq dd { margin: 4px 0 0; color: var(--dim); font-size: 12.5px; line-height: 1.6; }
+
+/* 上次抓取结果常驻显示，避免底部短提示消失后无处确认 */
+.run-summary {
+  display: flex; align-items: center; gap: 8px; margin: -12px 0 20px;
+  padding: 9px 12px; color: var(--ok); background: var(--s1);
+  border: 1px solid var(--line); border-radius: var(--rad); font-size: 12.5px;
+}
+.run-summary.bad { color: var(--bad); }
+.run-summary time { margin-left: auto; color: var(--dim); white-space: nowrap; }
+
 /* 视图标题区 */
 .page-title { font-size: 20px; font-weight: 600; letter-spacing: -.3px; display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
 .page-title .count { font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--acc); background: var(--soft); border-radius: 11px; padding: 2px 9px; font-weight: 500; }
@@ -431,4 +458,6 @@ button { font-family: inherit; }
   .nav .label, .nav .cnt, .collapse .label, .acct .who { display: none; }
   .nav { justify-content: center; padding: 9px 0; gap: 0; }
   .collapse { display: none; }
+  .guide-steps, .push-platforms { grid-template-columns: 1fr; }
+  .help-list { grid-template-columns: 1fr; }
 }

@@ -103,7 +103,7 @@ class LicenseClient:
             raise RuntimeError("尚未配置授权服务器")
         response = httpx.post(
             f"{self.server_url}/v1/{endpoint}",
-            json={"license_key": license_key, "device_id": device_id(), "app_version": "0.1.0"},
+            json={"license_key": license_key, "device_id": device_id(), "app_version": "0.2.0"},
             timeout=12.0,
         )
         response.raise_for_status()

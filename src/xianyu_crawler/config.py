@@ -77,6 +77,7 @@ class Settings(BaseSettings):
     smtp_pass: str | None = None
     notify_to: str | None = None
     bark_url: str | None = None
+    pushplus_token: str | None = None
     dingtalk_webhook: str | None = None
     license_server: str | None = Field(default_factory=bundled_license_server)
     license_required: bool = True

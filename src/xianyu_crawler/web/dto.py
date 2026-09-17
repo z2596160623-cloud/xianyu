@@ -63,6 +63,7 @@ class ConfigIn(BaseModel):
     smtp_user: str | None = None
     smtp_pass: str | None = None        # 只接收, 不回传
     bark_url: str | None = None
+    pushplus_token: str | None = None
     dingtalk_webhook: str | None = None
     # 邮件提醒事件开关
     notify_on_new: bool | None = None
@@ -103,6 +104,7 @@ class ConfigOut(BaseModel):
     smtp_user: str | None = None
     smtp_pass_set: bool = False         # 是否已设置密码(不回传明文)
     bark_url_set: bool = False
+    pushplus_token_set: bool = False
     dingtalk_webhook_set: bool = False
     # 邮件提醒事件开关
     notify_on_new: bool = True
@@ -216,6 +218,7 @@ def config_to_out(c: AppConfig) -> ConfigOut:
         smtp_user=c.smtp_user,
         smtp_pass_set=bool(c.smtp_pass),
         bark_url_set=bool(c.bark_url),
+        pushplus_token_set=bool(c.pushplus_token),
         dingtalk_webhook_set=bool(c.dingtalk_webhook),
         notify_on_new=c.notify_on_new,
         notify_on_drop=c.notify_on_drop,

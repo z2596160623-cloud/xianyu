@@ -39,11 +39,10 @@ def _notify(session, settings) -> int:
         subject, body = notifier.format_email(selected)
         html = notifier.format_email_html(selected)
         notifier.send_email(settings, subject, body, html)
-        for event in selected:
-            try:
-                push.send_event(settings, event)
-            except Exception:
-                pass  # 单个推送渠道失败不影响抓取与其它通知
+        try:
+            push.send_events(settings, selected)
+        except Exception:
+            pass  # 手机推送失败不影响抓取与邮件
     repo.mark_notified(session, [e.id for e in evs])               # 含未发邮件的也标记
     return len(selected)
 

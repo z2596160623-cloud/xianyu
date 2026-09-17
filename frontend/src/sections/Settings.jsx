@@ -8,6 +8,7 @@ export default function Settings({ status }) {
   const [pwd, setPwd] = useState('') // SMTP 密码单独管理: 只在用户输入时才提交
   const [token, setToken] = useState('') // LLM token 同理(只写)
   const [barkUrl, setBarkUrl] = useState('')
+  const [pushplusToken, setPushplusToken] = useState('')
   const [dingtalkUrl, setDingtalkUrl] = useState('')
   const [testMsg, setTestMsg] = useState(null)
   const [testing, setTesting] = useState(false)
@@ -44,6 +45,7 @@ export default function Settings({ status }) {
     smtp_pass: pwd.trim() || null,
     review_api_token: token.trim() || null,
     bark_url: barkUrl.trim() || null,
+    pushplus_token: pushplusToken.trim() || null,
     dingtalk_webhook: dingtalkUrl.trim() || null,
   })
 
@@ -53,6 +55,7 @@ export default function Settings({ status }) {
     setPwd('')
     setToken('')
     setBarkUrl('')
+    setPushplusToken('')
     setDingtalkUrl('')
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -64,6 +67,7 @@ export default function Settings({ status }) {
     try {
       await api.saveConfig(payload())
       setBarkUrl('')
+      setPushplusToken('')
       setDingtalkUrl('')
       const r = await api.testPush()
       setTestMsg(r.ok ? { ok: true, text: `手机推送成功（${r.sent}个渠道）` } : { ok: false, text: r.error })
@@ -123,6 +127,17 @@ export default function Settings({ status }) {
     <section>
       <h1 className="page-title">设置</h1>
 
+      <Card className="form-card quick-guide">
+        <div className="form-title">首次使用，只需完成4步</div>
+        <div className="guide-steps">
+          <span><b>1</b>扫码登录闲鱼</span>
+          <span><b>2</b>到「条件」添加关键词和价格</span>
+          <span><b>3</b>选择一种手机推送并测试</span>
+          <span><b>4</b>点击右上角「立即运行」</span>
+        </div>
+        <p className="form-hint">电脑和软件需要保持开启；程序会自动去重，只提醒新出现的商品。</p>
+      </Card>
+
       <Card className="form-card">
         <div className="form-title">闲鱼登录</div>
         <p className="form-hint">
@@ -171,16 +186,33 @@ export default function Settings({ status }) {
 
       <Card className="form-card">
         <div className="form-title">手机推送</div>
-        <p className="form-hint">iPhone 推荐 Bark；安卓和 iPhone 都可以使用钉钉机器人。推送消息可直接打开闲鱼商品。</p>
-        <div className="form-grid">
-          <Field label="Bark 推送地址" hint={cfg.bark_url_set ? '已设置，留空则不修改' : '在 Bark App 中复制完整 https 地址'}>
-            <input type="password" value={barkUrl} onChange={(e) => setBarkUrl(e.target.value)}
-              placeholder={cfg.bark_url_set ? '••••••（已设置）' : 'https://api.day.app/你的Key'} />
-          </Field>
-          <Field label="钉钉机器人 Webhook" hint={cfg.dingtalk_webhook_set ? '已设置，留空则不修改' : '群机器人提供的 https 地址'}>
-            <input type="password" value={dingtalkUrl} onChange={(e) => setDingtalkUrl(e.target.value)}
-              placeholder={cfg.dingtalk_webhook_set ? '••••••（已设置）' : 'https://oapi.dingtalk.com/robot/send?...'} />
-          </Field>
+        <p className="form-hint">三种方式任选一种即可。多件新品会合并成一条摘要，避免连续轰炸手机。</p>
+        <div className="push-platforms">
+          <div className="push-platform recommended">
+            <div className="push-platform-title"><i className="ti ti-brand-apple" />iPhone · Bark <em>推荐</em></div>
+            <p>安装 Bark，复制以 https://api.day.app/ 开头的个人地址。</p>
+            <Field label="Bark 推送地址" hint={cfg.bark_url_set ? '已设置，留空则不修改' : '不要包含末尾的 /Body Text'}>
+              <input type="password" value={barkUrl} onChange={(e) => setBarkUrl(e.target.value)}
+                placeholder={cfg.bark_url_set ? '••••••（已设置）' : 'https://api.day.app/你的Key'} />
+            </Field>
+          </div>
+          <div className="push-platform recommended">
+            <div className="push-platform-title"><i className="ti ti-brand-android" />安卓 · PushPlus <em>微信接收</em></div>
+            <p>在 PushPlus 官网绑定微信后复制 Token。平台要求实名，免费额度每天200次。</p>
+            <Field label="PushPlus Token" hint={cfg.pushplus_token_set ? '已设置，留空则不修改' : '只填写 Token，不要填写网页地址'}>
+              <input type="password" value={pushplusToken} onChange={(e) => setPushplusToken(e.target.value)}
+                placeholder={cfg.pushplus_token_set ? '••••••（已设置）' : '你的 PushPlus Token'} />
+            </Field>
+            <a className="setup-link" href="https://www.pushplus.plus/" target="_blank" rel="noreferrer">打开 PushPlus 官网</a>
+          </div>
+          <div className="push-platform">
+            <div className="push-platform-title"><i className="ti ti-brand-dingtalk" />安卓 / iPhone · 钉钉</div>
+            <p>适合已经使用钉钉群机器人的用户，新手可以先跳过。</p>
+            <Field label="钉钉机器人 Webhook" hint={cfg.dingtalk_webhook_set ? '已设置，留空则不修改' : '群机器人提供的 https 地址'}>
+              <input type="password" value={dingtalkUrl} onChange={(e) => setDingtalkUrl(e.target.value)}
+                placeholder={cfg.dingtalk_webhook_set ? '••••••（已设置）' : 'https://oapi.dingtalk.com/robot/send?...'} />
+            </Field>
+          </div>
         </div>
         <div className="form-row">
           {testMsg && <span className={testMsg.ok ? 'test-ok' : 'test-err'}>{testMsg.ok ? '✓ ' : '✗ '}{testMsg.text}</span>}

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, Navigate, Route, Routes } from 'react-router-dom'
+import { Link, NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { api } from './api'
 import { yuan, fmtDateTime } from './util'
 import Recommendations from './sections/Recommendations'
 import Drops from './sections/Drops'
 import Watches from './sections/Watches'
 import Settings from './sections/Settings'
+import Help from './sections/Help'
 
 // 5 套大厂皮肤(色板用于顶栏选择器: bg + accent 双色圆点)
 const SKINS = [
@@ -21,6 +22,7 @@ const NAV = [
   ['/favorites', '收藏', 'ti-bookmark', 'favorites'],
   ['/watches', '条件', 'ti-target', 'watches'],
   ['/settings', '设置', 'ti-settings', null],
+  ['/help', '帮助', 'ti-help-circle', null],
 ]
 
 // 实时事件按类型分 tab(全部 + 各事件类型)
@@ -127,6 +129,7 @@ function EventRow({ e }) {
 }
 
 export default function App() {
+  const navigate = useNavigate()
   const [skin, setSkin] = useState(() => localStorage.getItem('xy-skin') || 'linear')
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem('xy-side') === '1')
   const [status, setStatus] = useState(null)
@@ -201,9 +204,18 @@ export default function App() {
 
   const run = async (watch) => {
     setRunMenu(false)
-    await api.run(watch)
-    showToast(watch ? `已触发「${watch}」抓取…` : '已触发全部抓取，约 30–60 秒，完成后自动刷新…')
-    poll()
+    if (!login.has_state) {
+      showToast('请先在设置页扫码登录闲鱼账号')
+      navigate('/settings')
+      return
+    }
+    try {
+      await api.run(watch)
+      showToast(watch ? `已触发「${watch}」抓取…` : '已触发全部抓取，约 30–60 秒，完成后自动刷新…')
+      poll()
+    } catch (e) {
+      showToast(e.message || '启动抓取失败')
+    }
   }
 
   const running = status?.running
@@ -329,6 +341,18 @@ export default function App() {
           ))}
         </div>
 
+        {status?.last && (
+          <div className={'run-summary' + (status.last.error ? ' bad' : '')}>
+            <i className={'ti ' + (status.last.error ? 'ti-alert-circle' : 'ti-circle-check')} />
+            <span>
+              {status.last.error
+                ? `上次运行失败：${status.last.error}`
+                : `上次运行完成：新推荐 ${status.last.recommendations ?? 0} · 降价 ${status.last.drops ?? 0}`}
+            </span>
+            {status.last.at && <time>{fmtDateTime(status.last.at)}</time>}
+          </div>
+        )}
+
         <Routes>
           <Route path="/" element={<Navigate to="/recommendations" replace />} />
           <Route
@@ -338,6 +362,7 @@ export default function App() {
           <Route path="/favorites" element={<Drops refreshKey={refreshKey} />} />
           <Route path="/watches" element={<Watches />} />
           <Route path="/settings" element={<Settings status={status} />} />
+          <Route path="/help" element={<Help />} />
           <Route path="*" element={<Navigate to="/recommendations" replace />} />
         </Routes>
       </div>
