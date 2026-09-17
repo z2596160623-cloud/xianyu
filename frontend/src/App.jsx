@@ -18,11 +18,11 @@ const SKINS = [
 ]
 
 const NAV = [
-  ['/recommendations', '推荐', 'ti-sparkles', 'pending'],
-  ['/favorites', '收藏', 'ti-bookmark', 'favorites'],
-  ['/watches', '条件', 'ti-target', 'watches'],
+  ['/recommendations', '发现商品', 'ti-sparkles', 'pending'],
+  ['/watches', '监控任务', 'ti-target', 'watches'],
+  ['/favorites', '降价监控', 'ti-bookmark', 'favorites'],
   ['/settings', '设置', 'ti-settings', null],
-  ['/help', '帮助', 'ti-help-circle', null],
+  ['/help', '使用帮助', 'ti-help-circle', null],
 ]
 
 // 实时事件按类型分 tab(全部 + 各事件类型)
@@ -220,9 +220,9 @@ export default function App() {
 
   const running = status?.running
   const metrics = [
-    { k: '待审推荐', i: 'ti-inbox', v: stats.pending, small: stats.passed ? `通过 ${stats.passed}` : null },
-    { k: '监控条件', i: 'ti-target', v: stats.watches },
-    { k: '收藏监控', i: 'ti-bookmark', v: stats.favorites },
+    { k: '新发现', i: 'ti-inbox', v: stats.pending, small: stats.passed ? `筛选后 ${stats.passed}` : null },
+    { k: '监控任务', i: 'ti-target', v: stats.watches },
+    { k: '降价监控', i: 'ti-bookmark', v: stats.favorites },
     { k: '今日降价', i: 'ti-trending-down', v: stats.drops_today },
     { k: '死链', i: 'ti-circle-x', v: stats.dead },
   ]
@@ -271,7 +271,7 @@ export default function App() {
         <div className="run-wrap">
           <button className="run" disabled={running} onClick={() => setRunMenu((o) => !o)}>
             <i className="ti ti-player-play" />
-            立即运行
+            立即检查
             <i className="ti ti-chevron-down" style={{ fontSize: 14 }} />
           </button>
           {runMenu && (
@@ -280,7 +280,7 @@ export default function App() {
               <div className="run-menu">
                 <button onClick={() => run(null)}>
                   <i className="ti ti-player-play" />
-                  运行全部条件
+                  检查全部任务
                 </button>
                 {watchList.length > 0 && <div className="run-sep" />}
                 {watchList.map((w) => (

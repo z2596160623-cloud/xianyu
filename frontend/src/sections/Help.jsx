@@ -1,18 +1,18 @@
 import { Card } from '../components/ui'
 
 const rows = [
-  ['1. 登录闲鱼', '设置 → 扫码登录，用手机闲鱼确认。顶部显示“登录态正常”才算成功。'],
-  ['2. 添加条件', '条件 → 新增。先只填搜索词和价格，地区、成色等筛选确认能抓到后再加。'],
-  ['3. 配置推送', 'iPhone 推荐 Bark；安卓推荐 PushPlus 微信；已有钉钉群的用户也可使用机器人。三选一即可。'],
-  ['4. 手动试跑', '右上角“立即运行”选择条件。首次结果较多属于正常，后续会自动去重。'],
-  ['5. 自动监控', '设置推荐抓取间隔并保存。电脑与软件必须保持开启，关机后停止监控。'],
+  ['1. 扫码登录闲鱼', '打开“设置”，点“扫码登录”，用手机闲鱼 App 扫码并确认。顶部出现“登录态正常”就成功了。'],
+  ['2. 创建监控任务', '打开“监控任务”，填写想找的商品和价格。地区、成色都是选填；条件越多，越可能找不到。'],
+  ['3. 立即检查一次', '点右上角“立即检查”。第一次会记录已有商品，结果可能较多；以后只提醒新出现的商品。'],
+  ['4. 手机提醒（选做）', '不设置也能正常监控，只是需要在电脑上看结果。iPhone 可用 Bark，安卓可用 PushPlus，二选一即可。'],
+  ['5. 保持软件开启', '这是电脑本地版：电脑开机、网络正常、软件没有退出时才会自动检查。'],
 ]
 
 export default function Help() {
   return (
     <section>
-      <h1 className="page-title">使用帮助</h1>
-      <p className="page-sub">第一次使用按顺序完成下面5步，不需要配置 AI、邮箱或高级选项。</p>
+      <div className="page-hero compact"><div><span className="eyebrow">新手指南</span><h1 className="page-title">5 分钟开始监控</h1>
+      <p className="page-sub">只有“登录、创建任务、检查一次”是必做。手机提醒、AI 和邮件都是选做。</p></div></div>
       <div className="help-list">
         {rows.map(([title, text]) => (
           <Card className="help-step" key={title}>

@@ -84,26 +84,29 @@ export default function Watches() {
 
   return (
     <section>
-      <h1 className="page-title">监控条件</h1>
-      <p className="page-sub">关键词与价格范围等，定时按这些条件搜索并推荐。</p>
+      <div className="page-hero">
+        <div><span className="eyebrow">第 2 步</span><h1 className="page-title">监控任务</h1>
+        <p className="page-sub">告诉软件你想找什么。第一次建议只填商品和价格，找到后再增加筛选。</p></div>
+        <div className="hero-tip"><i className="ti ti-bulb" /><span><b>示例</b>想买 iPhone 15，预算 3500 元，搜索词填“iPhone 15”，最高价填“3500”。</span></div>
+      </div>
 
       <Card className="form-card">
-        <div className="form-title">{form.id ? '编辑条件' : '新增条件'}</div>
+        <div className="form-title">{form.id ? '编辑任务' : '创建一个监控任务'}</div>
         <div className="form-grid">
-          <Field label="名称">
-            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="iPhone15Pro" />
+          <Field label="任务名称" hint="只用来区分任务，随便起一个好记的名字">
+            <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="例：3500元以下的 iPhone 15" />
           </Field>
-          <Field label="搜索词" hint="整体作为一条搜索词去搜（空格分隔），不是逐词分搜">
+          <Field label="想找的商品" hint="和你在闲鱼搜索框里输入的内容一样">
             <input
               value={form.keywordsText}
               onChange={(e) => set('keywordsText', e.target.value)}
               placeholder="MacBook Pro M1 Pro 16寸 32G 1T"
             />
           </Field>
-          <Field label="最低价">
+          <Field label="最低价（选填）">
             <input type="number" value={form.price_min} onChange={(e) => set('price_min', e.target.value)} />
           </Field>
-          <Field label="最高价">
+          <Field label="最高价（选填）">
             <input type="number" value={form.price_max} onChange={(e) => set('price_max', e.target.value)} />
           </Field>
           <Field label="城市（可选）">
@@ -117,9 +120,11 @@ export default function Watches() {
             />
           </Field>
         </div>
-        <div className="req-field">
+        <details className="advanced-block req-field">
+          <summary><span><i className="ti ti-sparkles" /> AI 智能筛选</span><em>高级功能 · 不设置也能正常监控</em></summary>
+          <div className="advanced-body">
           <Field
-            label="AI 审核要求（自然语言，可选）"
+            label="用一句话说明筛选要求（选填）"
             hint="定时搜索命中后，交给大模型按这段要求二次筛选；不符合的不会进推荐。"
           >
             <textarea
@@ -130,7 +135,8 @@ export default function Watches() {
               placeholder="例：只要 14 寸 M5 Pro 国行本机，48G 以上，成色 95 新以上，价格不超过 19000，排除 16 寸 / Max 芯片 / 未拆封全新 / 配件 / 维修"
             />
           </Field>
-        </div>
+          </div>
+        </details>
         <div className="form-row">
           <Toggle checked={form.free_shipping} onChange={(v) => set('free_shipping', v)} label="仅包邮" />
           <Toggle checked={form.enabled} onChange={(v) => set('enabled', v)} label="启用" />
@@ -140,12 +146,12 @@ export default function Watches() {
               取消
             </Button>
           )}
-          <Button onClick={save}>{form.id ? '保存' : '添加'}</Button>
+          <Button onClick={save}>{form.id ? '保存修改' : '创建任务'}</Button>
         </div>
       </Card>
 
       {list.length === 0 ? (
-        <EmptyState title="还没有监控条件" sub="在上面添加一个，定时任务就会开始找货" />
+        <EmptyState title="还没有监控任务" sub="创建第一个任务后，点右上角‘立即检查’试跑一次" />
       ) : (
         <div className="watch-list">
           {list.map((w) => (

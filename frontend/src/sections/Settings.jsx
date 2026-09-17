@@ -125,17 +125,17 @@ export default function Settings({ status }) {
 
   return (
     <section>
-      <h1 className="page-title">设置</h1>
+      <div className="page-hero compact"><div><span className="eyebrow">账号与运行</span><h1 className="page-title">设置</h1>
+      <p className="page-sub">普通用户只需登录闲鱼和选择检查间隔。手机提醒、AI 和邮件均为选做。</p></div></div>
 
       <Card className="form-card quick-guide">
-        <div className="form-title">首次使用，只需完成4步</div>
+        <div className="form-title">首次使用，只有3步必做</div>
         <div className="guide-steps">
           <span><b>1</b>扫码登录闲鱼</span>
-          <span><b>2</b>到「条件」添加关键词和价格</span>
-          <span><b>3</b>选择一种手机推送并测试</span>
-          <span><b>4</b>点击右上角「立即运行」</span>
+          <span><b>2</b>到「监控任务」填商品和价格</span>
+          <span><b>3</b>点右上角「立即检查」</span>
         </div>
-        <p className="form-hint">电脑和软件需要保持开启；程序会自动去重，只提醒新出现的商品。</p>
+        <p className="form-hint">手机提醒可以稍后再设置，跳过不影响电脑端监控。</p>
       </Card>
 
       <Card className="form-card">
@@ -185,8 +185,8 @@ export default function Settings({ status }) {
       </Card>
 
       <Card className="form-card">
-        <div className="form-title">手机推送</div>
-        <p className="form-hint">三种方式任选一种即可。多件新品会合并成一条摘要，避免连续轰炸手机。</p>
+        <div className="form-title">手机提醒 <span className="optional-tag">选做</span></div>
+        <p className="form-hint">不配置也能正常监控，只是需要打开电脑查看。需要时三种方式任选一种，不要全部配置。</p>
         <div className="push-platforms">
           <div className="push-platform recommended">
             <div className="push-platform-title"><i className="ti ti-brand-apple" />iPhone · Bark <em>推荐</em></div>
@@ -223,15 +223,24 @@ export default function Settings({ status }) {
       </Card>
 
       <Card className="form-card">
-        <div className="form-title">定时与阈值</div>
+        <div className="form-title">自动检查</div>
         <div className="form-grid">
-          <Field label="推荐抓取间隔（分钟）" hint="搜索发现新商品的周期">
-            <input
-              type="number"
+          <Field label="每隔多久检查一次" hint="10分钟适合大多数人，越快越容易触发闲鱼限制">
+            <select
               value={cfg.schedule_minutes}
               onChange={(e) => set('schedule_minutes', Number(e.target.value))}
-            />
+            ><option value={5}>5分钟（较快）</option><option value={10}>10分钟（推荐）</option><option value={30}>30分钟（更稳妥）</option></select>
           </Field>
+        </div>
+        <div className="form-row basic-actions">
+          <Toggle checked={cfg.paused} onChange={(v) => set('paused', v)} label="暂停自动检查" />
+          <div className="grow" />
+          {saved && <span className="saved-hint">已保存</span>}
+          <Button onClick={save}>保存基础设置</Button>
+        </div>
+        <details className="advanced-block req-field">
+          <summary><span><i className="ti ti-adjustments-horizontal" /> 更多运行参数</span><em>保持默认即可</em></summary>
+          <div className="advanced-body"><div className="form-grid">
           <Field label="收藏刷新间隔（分钟）" hint="独立定时: 刷新收藏价格/降价/死链">
             <input
               type="number"
@@ -272,14 +281,17 @@ export default function Settings({ status }) {
           </Field>
         </div>
         <div className="form-row">
-          <Toggle checked={cfg.paused} onChange={(v) => set('paused', v)} label="暂停定时任务" />
           <Toggle checked={cfg.headless} onChange={(v) => set('headless', v)} label="无头浏览器" />
           <div className="grow" />
           {saved && <span className="saved-hint">已保存</span>}
           <Button onClick={save}>保存</Button>
         </div>
+          </div>
+        </details>
       </Card>
 
+      <details className="advanced-settings">
+        <summary><span><i className="ti ti-adjustments" /> 高级功能</span><em>普通用户无需打开</em></summary>
       <Card className="form-card">
         <div className="form-title">邮件通知（SMTP）</div>
         <p className="form-hint">
@@ -469,6 +481,7 @@ export default function Settings({ status }) {
           <Button onClick={save}>保存</Button>
         </div>
       </Card>
+      </details>
 
       <Card className="form-card">
         <div className="form-title">运行状态</div>
