@@ -126,9 +126,11 @@ def _setup_logging(data_dir: Path) -> None:
                              backupCount=2, encoding="utf-8")
     fh.setFormatter(fmt)
     root.addHandler(fh)
-    sh = logging.StreamHandler()
-    sh.setFormatter(fmt)
-    root.addHandler(sh)
+    # PyInstaller windowed/console=False sets stderr to None on Windows.
+    if sys.stderr is not None:
+        sh = logging.StreamHandler()
+        sh.setFormatter(fmt)
+        root.addHandler(sh)
 
 
 def main() -> None:
@@ -161,7 +163,11 @@ def main() -> None:
     print(f">> 闲鱼控制台: {url} (数据目录: {os.environ['XIANYU_DATA_DIR']})")
 
     # 服务跑后台线程, 主线程留给原生窗口(WKWebView 必须在主线程)
-    config = uvicorn.Config(app, host=HOST, port=port, log_level="warning")
+    # Uvicorn's default formatter calls sys.stdout.isatty(); windowed Windows
+    # applications have no stdout. We already configured rotating file logs.
+    config = uvicorn.Config(
+        app, host=HOST, port=port, log_level="warning", log_config=None, access_log=False
+    )
     server = uvicorn.Server(config)
     srv_thread = threading.Thread(target=server.run, daemon=True)
     srv_thread.start()
